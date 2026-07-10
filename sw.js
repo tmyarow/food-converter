@@ -4,7 +4,7 @@
  * is only the fallback when the kitchen wifi is out. Static assets are served
  * cache-first because they're fingerprinted by CACHE version, not by filename.
  */
-const CACHE = "food-converter-v1";
+const CACHE = "food-converter-v2";
 
 const SHELL = [
   "./",
@@ -35,11 +35,14 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return;
 
   if (req.mode === "navigate") {
+    // GitHub Pages serves HTML with `max-age=600`, and a plain fetch() reads the
+    // HTTP cache — which would leave "network-first" showing a ten-minute-old page
+    // after a deploy. Fetch by URL with `no-cache` so it always revalidates.
     event.respondWith(
-      fetch(req)
+      fetch(req.url, { cache: "no-cache", credentials: "same-origin" })
         .then((res) => {
           const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy));
+          caches.open(CACHE).then((c) => c.put("index.html", copy));
           return res;
         })
         .catch(() => caches.match(req).then((hit) => hit || caches.match("index.html")))
