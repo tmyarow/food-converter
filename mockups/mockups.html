@@ -1,0 +1,814 @@
+<!--
+  Mockups: Food Converter — grams ⇄ calories
+  Description: Three working mobile-first design directions for a 10-food gram/calorie converter.
+  Created: 2026-07-09
+  Last updated: 2026-07-09
+-->
+<meta charset="utf-8" />
+<title>Food Converter — Design Mockups</title>
+
+<style>
+  :root {
+    --paper:   #F2F4F4;
+    --card:    #FFFFFF;
+    --ink:     #10171A;
+    --muted:   #6A7A80;
+    --rule:    #D3DBDC;
+    --accent:  #0E8F9C;
+    --screen:  #FBFCFC;
+    --bezel:   #10171A;
+    --key:     #FFFFFF;
+    --key-edge:#C9D3D4;
+    --chip:    #E7ECEC;
+
+    --font-ui:  "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-num: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+    --hair: 1px;
+    --mid: 3px;
+    --heavy: 7px;
+
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
+    --s5: 24px; --s6: 32px; --s7: 48px; --s8: 72px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:   #0C1113;
+      --card:    #131A1D;
+      --ink:     #E6EDEE;
+      --muted:   #8A9BA1;
+      --rule:    #2A3639;
+      --accent:  #2FD3E1;
+      --screen:  #161E21;
+      --bezel:   #05090A;
+      --key:     #1D262A;
+      --key-edge:#2E3B3F;
+      --chip:    #222D31;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:   #0C1113;
+    --card:    #131A1D;
+    --ink:     #E6EDEE;
+    --muted:   #8A9BA1;
+    --rule:    #2A3639;
+    --accent:  #2FD3E1;
+    --screen:  #161E21;
+    --bezel:   #05090A;
+    --key:     #1D262A;
+    --key-edge:#2E3B3F;
+    --chip:    #222D31;
+  }
+  :root[data-theme="light"] {
+    --paper:   #F2F4F4;
+    --card:    #FFFFFF;
+    --ink:     #10171A;
+    --muted:   #6A7A80;
+    --rule:    #D3DBDC;
+    --accent:  #0E8F9C;
+    --screen:  #FBFCFC;
+    --bezel:   #10171A;
+    --key:     #FFFFFF;
+    --key-edge:#C9D3D4;
+    --chip:    #E7ECEC;
+  }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: var(--s7) var(--s5) var(--s8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s7);
+  }
+
+  /* ---- Masthead: nutrition-panel rule hierarchy ---- */
+  .masthead { display: flex; flex-direction: column; gap: var(--s3); }
+  .eyebrow {
+    font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700; margin: 0;
+  }
+  h1 {
+    font-size: clamp(34px, 5vw, 52px);
+    line-height: 1.02; letter-spacing: -.03em; font-weight: 700;
+    margin: 0; text-wrap: balance;
+  }
+  h1 .eq { color: var(--accent); font-family: var(--font-num); font-weight: 400; }
+  .standfirst {
+    font-size: 17px; color: var(--muted); margin: 0;
+    max-width: 62ch;
+  }
+  .rule-heavy { height: var(--heavy); background: var(--ink); border: 0; margin: 0; }
+  .rule-mid   { height: var(--mid);   background: var(--ink); border: 0; margin: 0; }
+  .rule-hair  { height: var(--hair);  background: var(--rule); border: 0; margin: 0; }
+
+  .facts {
+    display: flex; flex-wrap: wrap; gap: var(--s5);
+    padding-top: var(--s3);
+  }
+  .fact { display: flex; flex-direction: column; gap: 2px; }
+  .fact dt {
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700;
+  }
+  .fact dd { margin: 0; font-size: 15px; font-weight: 500; }
+
+  /* ---- Three-up ---- */
+  .options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--s6);
+    align-items: start;
+  }
+  .option { display: flex; flex-direction: column; gap: var(--s4); }
+
+  .option-head { display: flex; flex-direction: column; gap: var(--s1); }
+  .option-tag {
+    font-family: var(--font-num); font-size: 11px; letter-spacing: .1em;
+    color: var(--accent); font-weight: 700; text-transform: uppercase;
+  }
+  .option-name { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+  .option-line { font-size: 14px; color: var(--muted); margin: 0; }
+
+  .verdict {
+    display: flex; flex-direction: column; gap: var(--s2);
+    background: var(--card);
+    border: var(--hair) solid var(--rule);
+    border-top: var(--mid) solid var(--ink);
+    padding: var(--s4);
+  }
+  .verdict h3 {
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--muted); margin: 0; font-weight: 700;
+  }
+  .verdict ul { margin: 0; padding-left: 1.1em; font-size: 14px; }
+  .verdict li { margin-bottom: 4px; }
+  .verdict li::marker { color: var(--accent); }
+  .verdict .con::marker { color: var(--muted); }
+
+  .pick {
+    display: inline-block; align-self: flex-start;
+    font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+    font-weight: 700; color: var(--paper); background: var(--accent);
+    padding: 3px 8px;
+  }
+
+  /* ---- Phone ---- */
+  .phone {
+    width: 100%; max-width: 320px; margin: 0 auto;
+    aspect-ratio: 320 / 640;
+    background: var(--bezel);
+    border-radius: 40px;
+    padding: 10px;
+    box-shadow: 0 24px 48px -24px rgba(0,0,0,.45), 0 2px 0 0 var(--key-edge) inset;
+  }
+  .screen {
+    height: 100%;
+    background: var(--screen);
+    border-radius: 30px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+
+  .app-bar {
+    padding: 18px var(--s4) var(--s3);
+    display: flex; align-items: baseline; justify-content: space-between;
+    border-bottom: var(--mid) solid var(--ink);
+    flex: none;
+  }
+  .app-title { font-size: 13px; font-weight: 700; letter-spacing: -.01em; }
+  .app-sub {
+    font-family: var(--font-num); font-size: 10px; color: var(--muted);
+    letter-spacing: .06em; text-transform: uppercase;
+  }
+
+  /* food chips (A) */
+  .chips {
+    display: flex; gap: var(--s2); overflow-x: auto; padding: var(--s3) var(--s4);
+    flex: none; scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none; border: var(--hair) solid var(--rule); background: var(--chip);
+    color: var(--ink); border-radius: 999px; padding: 8px 14px;
+    font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+    white-space: nowrap; transition: background .12s, color .12s, border-color .12s;
+  }
+  .chip[aria-pressed="true"] {
+    background: var(--ink); color: var(--screen); border-color: var(--ink);
+  }
+  .chip:focus-visible, .key:focus-visible, .toggle button:focus-visible,
+  .foodcard:focus-visible, .preset:focus-visible, .sheet-back:focus-visible,
+  select:focus-visible, input:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+
+  /* readout */
+  .readout {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    padding: 0 var(--s4); gap: var(--s1); min-height: 0;
+  }
+  .ro-label {
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700;
+  }
+  .ro-primary {
+    font-family: var(--font-num); font-variant-numeric: tabular-nums;
+    font-size: 52px; line-height: 1; letter-spacing: -.04em; font-weight: 500;
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .ro-primary .unit { font-size: 20px; color: var(--muted); letter-spacing: 0; }
+  .ro-primary .caret {
+    width: 2px; height: 44px; background: var(--accent); display: inline-block;
+    animation: blink 1.1s steps(1) infinite; align-self: center;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .ro-primary .caret { animation: none; }
+    * { scroll-behavior: auto !important; }
+  }
+  .ro-divider { height: var(--hair); background: var(--rule); margin: var(--s3) 0; }
+  .ro-secondary {
+    font-family: var(--font-num); font-variant-numeric: tabular-nums;
+    font-size: 34px; line-height: 1; letter-spacing: -.03em;
+    color: var(--accent); display: flex; align-items: baseline; gap: 6px;
+  }
+  .ro-secondary .unit { font-size: 15px; opacity: .7; letter-spacing: 0; }
+
+  /* unit toggle */
+  .toggle {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    margin: 0 var(--s4) var(--s3);
+    border: var(--hair) solid var(--rule); border-radius: 10px; overflow: hidden;
+    flex: none;
+  }
+  .toggle button {
+    font: inherit; font-size: 12px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; padding: 10px 0; border: 0; cursor: pointer;
+    background: var(--card); color: var(--muted);
+  }
+  .toggle button[aria-pressed="true"] { background: var(--ink); color: var(--screen); }
+
+  /* keypad */
+  .keypad {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--hair);
+    background: var(--rule); border-top: var(--hair) solid var(--rule); flex: none;
+  }
+  .key {
+    background: var(--key); border: 0; color: var(--ink);
+    font-family: var(--font-num); font-size: 22px; font-weight: 500;
+    padding: 16px 0; cursor: pointer; transition: background .08s;
+  }
+  .key:active { background: var(--chip); }
+  .key.wide { grid-column: span 1; }
+  .key.util { color: var(--muted); font-size: 18px; }
+
+  /* ---- B: twin fields ---- */
+  .stack { flex: 1; display: flex; flex-direction: column; gap: var(--s4); padding: var(--s4); min-height: 0; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700;
+  }
+  .field .box {
+    display: flex; align-items: baseline; gap: var(--s2);
+    border: var(--hair) solid var(--rule); border-bottom: var(--mid) solid var(--ink);
+    background: var(--card); padding: var(--s3);
+  }
+  .field input {
+    font-family: var(--font-num); font-variant-numeric: tabular-nums;
+    font-size: 30px; font-weight: 500; letter-spacing: -.03em;
+    border: 0; background: transparent; color: var(--ink);
+    width: 100%; min-width: 0; padding: 0; -moz-appearance: textfield;
+  }
+  .field input::-webkit-outer-spin-button,
+  .field input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .field .suffix { font-size: 14px; color: var(--muted); font-weight: 500; flex: none; }
+  .linker {
+    display: flex; align-items: center; gap: var(--s3); color: var(--muted);
+  }
+  .linker .bar { flex: 1; height: var(--hair); background: var(--rule); }
+  .linker .glyph { font-family: var(--font-num); font-size: 18px; color: var(--accent); }
+  .picker { display: flex; flex-direction: column; gap: 6px; }
+  .picker label {
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--muted); font-weight: 700;
+  }
+  select {
+    font: inherit; font-size: 16px; font-weight: 500; color: var(--ink);
+    background: var(--card); border: var(--hair) solid var(--rule);
+    border-bottom: var(--mid) solid var(--ink);
+    padding: var(--s3); width: 100%; border-radius: 0;
+  }
+  .density {
+    font-family: var(--font-num); font-size: 11px; color: var(--muted);
+    letter-spacing: .04em; text-align: center; padding-bottom: var(--s3);
+  }
+
+  /* ---- C: grid + sheet ---- */
+  .grid {
+    flex: 1; overflow-y: auto; padding: var(--s3);
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--s2);
+    align-content: start;
+  }
+  .foodcard {
+    display: flex; flex-direction: column; justify-content: space-between; gap: var(--s4);
+    background: var(--card); border: var(--hair) solid var(--rule);
+    border-top: var(--mid) solid var(--ink);
+    padding: var(--s3); min-height: 92px; cursor: pointer; text-align: left;
+    font: inherit; color: var(--ink);
+  }
+  .foodcard:active { background: var(--chip); }
+  .foodcard .fc-name { font-size: 13px; font-weight: 700; line-height: 1.2; letter-spacing: -.01em; }
+  .foodcard .fc-density {
+    font-family: var(--font-num); font-variant-numeric: tabular-nums;
+    font-size: 11px; color: var(--muted);
+  }
+  .foodcard .fc-density b { color: var(--accent); font-weight: 500; }
+
+  .sheet {
+    position: absolute; inset: 0; background: var(--screen);
+    display: flex; flex-direction: column;
+    transform: translateY(100%); transition: transform .28s cubic-bezier(.2,.8,.2,1);
+  }
+  @media (prefers-reduced-motion: reduce) { .sheet { transition: none; } }
+  .sheet[data-open="true"] { transform: translateY(0); }
+  .sheet-bar {
+    display: flex; align-items: center; gap: var(--s3);
+    padding: 18px var(--s4) var(--s3);
+    border-bottom: var(--mid) solid var(--ink); flex: none;
+  }
+  .sheet-back {
+    font: inherit; font-family: var(--font-num); font-size: 18px;
+    background: transparent; border: 0; color: var(--muted); cursor: pointer;
+    padding: 0 var(--s1); line-height: 1;
+  }
+  .sheet-title { font-size: 14px; font-weight: 700; letter-spacing: -.01em; }
+  .presets {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s2);
+    padding: 0 var(--s4) var(--s4); flex: none;
+  }
+  .preset {
+    font: inherit; font-family: var(--font-num); font-size: 13px;
+    background: var(--chip); border: var(--hair) solid var(--rule);
+    color: var(--ink); padding: 10px 0; cursor: pointer; border-radius: 8px;
+  }
+  .preset:active { background: var(--ink); color: var(--screen); }
+
+  /* ---- footer ---- */
+  .closing {
+    display: flex; flex-direction: column; gap: var(--s4);
+    background: var(--card); border: var(--hair) solid var(--rule);
+    border-top: var(--heavy) solid var(--ink);
+    padding: var(--s5);
+  }
+  .closing h2 { font-size: 20px; margin: 0; letter-spacing: -.02em; }
+  .closing p { margin: 0; font-size: 15px; color: var(--muted); max-width: 68ch; }
+  .closing strong { color: var(--ink); font-weight: 700; }
+
+  .data-note {
+    display: flex; flex-direction: column; gap: var(--s2);
+    font-size: 13px; color: var(--muted);
+  }
+  .data-note code {
+    font-family: var(--font-num); font-size: 12px;
+    background: var(--chip); padding: 1px 5px; color: var(--ink);
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <hr class="rule-heavy" />
+    <p class="eyebrow">Design mockups · Round 1</p>
+    <h1>Grams <span class="eq">⇄</span> calories,<br />for ten foods you actually eat.</h1>
+    <p class="standfirst">
+      Three directions for the same job: type one number, read the other. All three below are live —
+      tap a food and start entering numbers. Pick the one that feels right with a scale in front of you.
+    </p>
+    <hr class="rule-mid" />
+    <dl class="facts">
+      <div class="fact"><dt>Optimized for</dt><dd>Phone, one hand, in the kitchen</dd></div>
+      <div class="fact"><dt>Shows</dt><dd>Grams and calories only</dd></div>
+      <div class="fact"><dt>Foods</dt><dd>10, fixed list</dd></div>
+      <div class="fact"><dt>Chicken tenders</dt><dd>Homemade panko, air-fried</dd></div>
+    </dl>
+    <hr class="rule-hair" />
+  </header>
+
+  <section class="options">
+
+    <!-- ============ A ============ -->
+    <article class="option">
+      <div class="option-head">
+        <span class="option-tag">Direction A</span>
+        <h2 class="option-name">Keypad</h2>
+        <p class="option-line">No OS keyboard, ever. Big keys, wet hands, phone flat on the counter.</p>
+      </div>
+
+      <div class="phone">
+        <div class="screen">
+          <div class="app-bar">
+            <span class="app-title">Converter</span>
+            <span class="app-sub" id="a-density">89 cal / 100g</span>
+          </div>
+
+          <div class="chips" id="a-chips" role="group" aria-label="Choose a food"></div>
+
+          <div class="readout">
+            <span class="ro-label" id="a-primary-label">Grams</span>
+            <div class="ro-primary">
+              <span id="a-primary">0</span><span class="caret" aria-hidden="true"></span>
+              <span class="unit" id="a-primary-unit">g</span>
+            </div>
+            <div class="ro-divider"></div>
+            <span class="ro-label" id="a-secondary-label">Calories</span>
+            <div class="ro-secondary">
+              <span id="a-secondary">0</span>
+              <span class="unit" id="a-secondary-unit">cal</span>
+            </div>
+          </div>
+
+          <div class="toggle" role="group" aria-label="Which unit am I typing?">
+            <button type="button" data-unit="g" aria-pressed="true">Type grams</button>
+            <button type="button" data-unit="cal" aria-pressed="false">Type calories</button>
+          </div>
+
+          <div class="keypad" id="a-keypad"></div>
+        </div>
+      </div>
+
+      <div class="verdict">
+        <h3>Why this</h3>
+        <ul>
+          <li>Keys are ~3× the size of an OS keyboard's. Works with a knuckle.</li>
+          <li>Nothing ever covers the answer — the keyboard is part of the screen.</li>
+          <li class="con">Toggling which unit you type is one extra concept to learn.</li>
+        </ul>
+      </div>
+    </article>
+
+    <!-- ============ B ============ -->
+    <article class="option">
+      <div class="option-head">
+        <span class="option-tag">Direction B</span>
+        <h2 class="option-name">Twin fields</h2>
+        <p class="option-line">Two boxes, permanently linked. Type in either one; the other follows.</p>
+      </div>
+
+      <div class="phone">
+        <div class="screen">
+          <div class="app-bar">
+            <span class="app-title">Converter</span>
+            <span class="app-sub">Both ways</span>
+          </div>
+
+          <div class="stack">
+            <div class="picker">
+              <label for="b-food">Food</label>
+              <select id="b-food"></select>
+            </div>
+
+            <div class="field">
+              <label for="b-grams">Weight</label>
+              <div class="box">
+                <input id="b-grams" type="number" inputmode="decimal" value="100" min="0" />
+                <span class="suffix">grams</span>
+              </div>
+            </div>
+
+            <div class="linker" aria-hidden="true">
+              <span class="bar"></span><span class="glyph">⇄</span><span class="bar"></span>
+            </div>
+
+            <div class="field">
+              <label for="b-cals">Energy</label>
+              <div class="box">
+                <input id="b-cals" type="number" inputmode="decimal" value="89" min="0" />
+                <span class="suffix">calories</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="density" id="b-density">BANANA · 89 CAL PER 100 G</div>
+        </div>
+      </div>
+
+      <div class="verdict">
+        <h3>Why this</h3>
+        <ul>
+          <li>Zero learning curve — it's the converter shape everyone already knows.</li>
+          <li>Both numbers are on screen at once, always.</li>
+          <li class="con">The OS keyboard covers the lower half, including one of the fields.</li>
+          <li class="con">Small, slippery targets. Worst option for greasy fingers.</li>
+        </ul>
+      </div>
+    </article>
+
+    <!-- ============ C ============ -->
+    <article class="option">
+      <div class="option-head">
+        <span class="option-tag">Direction C</span>
+        <h2 class="option-name">Pantry</h2>
+        <p class="option-line">Food first. Tap one, get a sheet with common portions already answered.</p>
+      </div>
+
+      <div class="phone">
+        <div class="screen">
+          <div class="app-bar">
+            <span class="app-title">Pantry</span>
+            <span class="app-sub">10 foods</span>
+          </div>
+
+          <div class="grid" id="c-grid"></div>
+
+          <div class="sheet" id="c-sheet" data-open="false" aria-hidden="true">
+            <div class="sheet-bar">
+              <button type="button" class="sheet-back" id="c-back" aria-label="Back to foods">←</button>
+              <span class="sheet-title" id="c-title">Banana</span>
+            </div>
+
+            <div class="readout">
+              <span class="ro-label">Grams</span>
+              <div class="ro-primary">
+                <span id="c-grams">100</span>
+                <span class="unit">g</span>
+              </div>
+              <div class="ro-divider"></div>
+              <span class="ro-label">Calories</span>
+              <div class="ro-secondary">
+                <span id="c-cals">89</span>
+                <span class="unit">cal</span>
+              </div>
+            </div>
+
+            <div class="presets" id="c-presets"></div>
+            <div class="keypad" id="c-keypad"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="verdict">
+        <h3>Why this</h3>
+        <ul>
+          <li>The grid answers "what's the calorie density again?" without any typing.</li>
+          <li>Portion chips (25 / 50 / 100 / 150 g) cover most of what you'd type anyway.</li>
+          <li class="con">Two screens instead of one. Every conversion costs a tap and a slide.</li>
+          <li class="con">Grams-only entry here — calories-first would need a third screen.</li>
+        </ul>
+      </div>
+    </article>
+
+  </section>
+
+  <hr class="rule-hair" />
+
+  <footer class="closing">
+    <span class="pick">Recommended</span>
+    <h2>Direction A, the keypad.</h2>
+    <p>
+      You told me this lives on a phone in a kitchen. That single fact rules out <strong>B</strong> — the
+      moment the OS keyboard slides up it eats the calories field, and you're aiming at 6mm targets with
+      fruit on your hands. <strong>C</strong> is genuinely nice for browsing, but it charges you a screen
+      transition for every conversion, and you said you need this information <em>easily</em>.
+      <strong>A</strong> puts the food, both numbers, and the keys on one screen that never moves.
+    </p>
+    <hr class="rule-hair" />
+    <div class="data-note">
+      <p style="margin:0;">
+        <strong style="color:var(--ink);">On the numbers.</strong> All values are calories per 100&nbsp;g of
+        edible portion — what actually lands on the scale. The nine whole foods come from USDA FoodData
+        Central. Three of them involved a judgment call worth knowing about:
+      </p>
+      <hr class="rule-hair" />
+      <p style="margin:0;">
+        <strong style="color:var(--ink);">Chicken tenders — <code>175</code>, calculated, not looked up.</strong>
+        Nothing in USDA matches your recipe, so this is built from it: 450&nbsp;g raw tenderloin at
+        1.10&nbsp;cal/g, plus the flour, egg, and panko that actually <em>adhere</em> (~70&nbsp;g, ~207&nbsp;cal
+        — dredging throws most of it away), then ~22% water loss in the air fryer, which concentrates
+        what's left. That's 715&nbsp;cal over ~408&nbsp;g finished. Confidence band is roughly
+        <code>160–190</code>; the swing is how heavily you bread them. Pan-frying these instead would put you
+        near <code>220</code>, because panko drinks oil.
+      </p>
+      <hr class="rule-hair" />
+      <p style="margin:0;">
+        <strong style="color:var(--ink);">Black beans — <code>118</code>, brand-sensitive.</strong>
+        That's USDA's regular canned, drained and rinsed. Low-sodium cans come in at <code>91</code>. That's a
+        30% spread on the same food, so it's worth checking your can.
+      </p>
+      <hr class="rule-hair" />
+      <p style="margin:0;">
+        <strong style="color:var(--ink);">Canned corn — <code>81</code>, drained.</strong>
+        Drained, not packing liquid included — with the liquid it's about <code>62</code>, since you're
+        weighing mostly water. USDA itself carries a competing <code>67</code> figure for drained solids;
+        if your can drains wet, lean low. Avocado uses <code>167</code> for Hass specifically, rather than the
+        <code>160</code> all-varieties average.
+      </p>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // kcal per 100 g, edible portion. USDA FoodData Central unless noted.
+  const FOODS = [
+    { key: "banana",     name: "Banana",         short: "Banana",     kcal100: 89 },
+    { key: "grapes",     name: "Grapes",         short: "Grapes",     kcal100: 69 },
+    { key: "strawberry", name: "Strawberries",   short: "Strawb.",    kcal100: 32 },
+    { key: "blueberry",  name: "Blueberries",    short: "Blueb.",     kcal100: 57 },
+    { key: "mango",      name: "Mango",          short: "Mango",      kcal100: 60 },
+    { key: "pineapple",  name: "Pineapple",      short: "Pineapple",  kcal100: 50 },
+    { key: "corn",       name: "Canned corn",    short: "Corn",       kcal100: 81, note: "drained" },
+    { key: "beans",      name: "Black beans",    short: "Beans",      kcal100: 118, note: "drained, rinsed" },
+    { key: "avocado",    name: "Avocado",        short: "Avocado",    kcal100: 167, note: "Hass" },
+    { key: "tenders",    name: "Chicken tenders", short: "Tenders",   kcal100: 175, note: "homemade panko, air-fried" }
+  ];
+
+  const fmt = (n) => {
+    if (!isFinite(n) || n === 0) return "0";
+    return n < 10 ? n.toFixed(1).replace(/\.0$/, "") : String(Math.round(n));
+  };
+  const gToCal = (g, d) => (g * d) / 100;
+  const calToG = (c, d) => (c * 100) / d;
+
+  const DEL = "⌫";
+  const KEYS = ["1","2","3","4","5","6","7","8","9",".","0", DEL];
+
+  function buildKeypad(mount, onKey) {
+    KEYS.forEach((k) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "key" + (k === DEL || k === "." ? " util" : "");
+      b.textContent = k;
+      if (k === DEL) b.setAttribute("aria-label", "Delete");
+      b.addEventListener("click", () => onKey(k));
+      mount.appendChild(b);
+    });
+  }
+
+  function pressDigit(buffer, k) {
+    if (k === DEL) return buffer.length <= 1 ? "0" : buffer.slice(0, -1);
+    if (k === ".") return buffer.includes(".") ? buffer : buffer + ".";
+    if (buffer === "0") return k;
+    if (buffer.replace(".", "").length >= 5) return buffer;
+    return buffer + k;
+  }
+
+  /* ================= A: Keypad ================= */
+  (function () {
+    let food = FOODS[0];
+    let unit = "g";
+    let buf = "0";
+
+    const chips = document.getElementById("a-chips");
+    const density = document.getElementById("a-density");
+    const pLabel = document.getElementById("a-primary-label");
+    const pVal = document.getElementById("a-primary");
+    const pUnit = document.getElementById("a-primary-unit");
+    const sLabel = document.getElementById("a-secondary-label");
+    const sVal = document.getElementById("a-secondary");
+    const sUnit = document.getElementById("a-secondary-unit");
+    const toggles = document.querySelectorAll('.toggle [data-unit]');
+
+    FOODS.forEach((f, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = f.short;
+      b.setAttribute("aria-pressed", String(i === 0));
+      b.addEventListener("click", () => {
+        food = f;
+        chips.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", "false"));
+        b.setAttribute("aria-pressed", "true");
+        render();
+      });
+      chips.appendChild(b);
+    });
+
+    toggles.forEach((t) => {
+      t.addEventListener("click", () => {
+        if (unit === t.dataset.unit) return;
+        unit = t.dataset.unit;
+        buf = "0";
+        toggles.forEach((o) => o.setAttribute("aria-pressed", String(o === t)));
+        render();
+      });
+    });
+
+    buildKeypad(document.getElementById("a-keypad"), (k) => { buf = pressDigit(buf, k); render(); });
+
+    function render() {
+      const n = parseFloat(buf) || 0;
+      density.textContent = `${food.kcal100} cal / 100g`;
+      pVal.textContent = buf;
+      if (unit === "g") {
+        pLabel.textContent = "Grams"; pUnit.textContent = "g";
+        sLabel.textContent = "Calories"; sUnit.textContent = "cal";
+        sVal.textContent = fmt(gToCal(n, food.kcal100));
+      } else {
+        pLabel.textContent = "Calories"; pUnit.textContent = "cal";
+        sLabel.textContent = "Grams"; sUnit.textContent = "g";
+        sVal.textContent = fmt(calToG(n, food.kcal100));
+      }
+    }
+    render();
+  })();
+
+  /* ================= B: Twin fields ================= */
+  (function () {
+    const sel = document.getElementById("b-food");
+    const g = document.getElementById("b-grams");
+    const c = document.getElementById("b-cals");
+    const density = document.getElementById("b-density");
+
+    FOODS.forEach((f) => {
+      const o = document.createElement("option");
+      o.value = f.key;
+      o.textContent = f.note ? `${f.name} (${f.note.split(",")[0]})` : f.name;
+      sel.appendChild(o);
+    });
+
+    const current = () => FOODS.find((f) => f.key === sel.value);
+
+    function fromGrams() {
+      const d = current().kcal100;
+      c.value = g.value === "" ? "" : fmt(gToCal(parseFloat(g.value) || 0, d));
+    }
+    function fromCals() {
+      const d = current().kcal100;
+      g.value = c.value === "" ? "" : fmt(calToG(parseFloat(c.value) || 0, d));
+    }
+    function refreshDensity() {
+      const f = current();
+      density.textContent = `${f.name.toUpperCase()} · ${f.kcal100} CAL PER 100 G`;
+    }
+
+    g.addEventListener("input", fromGrams);
+    c.addEventListener("input", fromCals);
+    sel.addEventListener("change", () => { refreshDensity(); fromGrams(); });
+    refreshDensity();
+  })();
+
+  /* ================= C: Pantry ================= */
+  (function () {
+    const grid = document.getElementById("c-grid");
+    const sheet = document.getElementById("c-sheet");
+    const title = document.getElementById("c-title");
+    const gEl = document.getElementById("c-grams");
+    const cEl = document.getElementById("c-cals");
+    const presets = document.getElementById("c-presets");
+    const back = document.getElementById("c-back");
+
+    let food = FOODS[0];
+    let buf = "100";
+
+    FOODS.forEach((f) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "foodcard";
+      b.innerHTML = `<span class="fc-name">${f.name}</span>
+                     <span class="fc-density"><b>${f.kcal100}</b> cal / 100g</span>`;
+      b.addEventListener("click", () => open(f));
+      grid.appendChild(b);
+    });
+
+    [25, 50, 100, 150].forEach((v) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "preset";
+      b.textContent = `${v}g`;
+      b.addEventListener("click", () => { buf = String(v); render(); });
+      presets.appendChild(b);
+    });
+
+    buildKeypad(document.getElementById("c-keypad"), (k) => { buf = pressDigit(buf, k); render(); });
+
+    function open(f) {
+      food = f; buf = "100";
+      title.textContent = f.name;
+      sheet.dataset.open = "true";
+      sheet.setAttribute("aria-hidden", "false");
+      render();
+    }
+    back.addEventListener("click", () => {
+      sheet.dataset.open = "false";
+      sheet.setAttribute("aria-hidden", "true");
+    });
+
+    function render() {
+      gEl.textContent = buf;
+      cEl.textContent = fmt(gToCal(parseFloat(buf) || 0, food.kcal100));
+    }
+    render();
+  })();
+</script>

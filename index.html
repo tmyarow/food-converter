@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Grams ⇄ Calories</title>
+<meta name="description" content="Convert between grams and calories for ten foods. Works offline." />
+
+<meta name="theme-color" content="#FBFCFC" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#10171A" media="(prefers-color-scheme: dark)" />
+
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="favicon-32.png" sizes="32x32" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Converter" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<style>
+  :root {
+    --ink:      #10171A;
+    --muted:    #6A7A80;
+    --rule:     #D3DBDC;
+    --accent:   #0E8F9C;
+    --screen:   #FBFCFC;
+    --card:     #FFFFFF;
+    --key:      #FFFFFF;
+    --key-down: #E7ECEC;
+    --chip:     #E7ECEC;
+
+    --font-ui:  "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-num: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+    --hair: 1px;
+    --mid: 3px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink:      #E6EDEE;
+      --muted:    #8A9BA1;
+      --rule:     #2A3639;
+      --accent:   #2FD3E1;
+      --screen:   #0C1113;
+      --card:     #131A1D;
+      --key:      #1D262A;
+      --key-down: #2A3639;
+      --chip:     #222D31;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    overscroll-behavior: none;
+  }
+
+  body {
+    background: var(--screen);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    /* Phone is the target. On a laptop, hold the phone proportions rather than
+       stretching a 10-key pad across 1400px. */
+    max-width: 460px;
+    margin-inline: auto;
+  }
+  @media (min-width: 461px) {
+    html { background: var(--card); }
+    body { border-inline: var(--hair) solid var(--rule); }
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- header ---------- */
+  .bar {
+    flex: none;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px 10px;
+    border-bottom: var(--mid) solid var(--ink);
+  }
+  .current {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .meta {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+    font-family: var(--font-num);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .meta .density { font-size: 10px; letter-spacing: .04em; color: var(--muted); }
+  .meta .density b { color: var(--accent); font-weight: 500; }
+  .meta .note { font-size: 9px; letter-spacing: .06em; color: var(--muted); opacity: .75; }
+  .meta .note:empty { display: none; }
+
+  /* ---------- food chips ---------- */
+  .chips {
+    flex: none;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 12px 16px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+
+  .chip {
+    flex: none;
+    border: var(--hair) solid var(--rule);
+    background: var(--chip);
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background .12s, color .12s, border-color .12s;
+  }
+  .chip[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--screen);
+    border-color: var(--ink);
+  }
+
+  /* ---------- readout ---------- */
+  .readout {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 16px;
+  }
+  .label {
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .value {
+    font-family: var(--font-num);
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+  }
+  .value .num {
+    font-size: clamp(40px, 15vw, 60px);
+    line-height: 1.05;
+    letter-spacing: -.04em;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .value .unit { font-size: 20px; color: var(--muted); }
+
+  .caret {
+    width: 2px;
+    height: .78em;
+    background: var(--accent);
+    align-self: center;
+    flex: none;
+    animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .divider { height: var(--hair); background: var(--rule); margin: 14px 0; }
+
+  .out .num { color: var(--accent); font-size: clamp(30px, 11vw, 40px); }
+  .out .unit { color: var(--accent); opacity: .7; font-size: 15px; }
+
+  /* ---------- unit toggle ---------- */
+  .toggle {
+    flex: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0 16px 12px;
+    border: var(--hair) solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .toggle button {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 13px 0;
+    border: 0;
+    background: var(--card);
+    color: var(--muted);
+  }
+  .toggle button[aria-pressed="true"] { background: var(--ink); color: var(--screen); }
+
+  /* ---------- keypad ---------- */
+  .keypad {
+    flex: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--hair);
+    background: var(--rule);
+    border-top: var(--hair) solid var(--rule);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .key {
+    background: var(--key);
+    border: 0;
+    font-family: var(--font-num);
+    font-size: 24px;
+    font-weight: 500;
+    padding: max(18px, 2.2vh) 0;
+    transition: background .06s;
+  }
+  .key[data-down="true"] { background: var(--key-down); }
+  .key.util { color: var(--muted); font-size: 22px; }
+  /* A 20px period is nearly invisible on a phone. Give it the digits' weight. */
+  .key.dot { font-size: 30px; line-height: .8; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .caret { animation: none; }
+    .chip, .key, .toggle button { transition: none; }
+  }
+
+  .noscript {
+    margin: 24px 16px;
+    padding: 16px;
+    border: var(--hair) solid var(--rule);
+    border-top: var(--mid) solid var(--ink);
+    font-size: 15px;
+  }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <span class="current" id="current"></span>
+  <span class="meta">
+    <span class="density" id="density"></span>
+    <span class="note" id="note"></span>
+  </span>
+</header>
+
+<nav class="chips" id="chips" aria-label="Choose a food"></nav>
+
+<main class="readout">
+  <span class="label" id="in-label">Grams</span>
+  <div class="value">
+    <span class="num" id="in-value">0</span>
+    <span class="caret" aria-hidden="true"></span>
+    <span class="unit" id="in-unit">g</span>
+  </div>
+
+  <div class="divider" role="presentation"></div>
+
+  <span class="label" id="out-label">Calories</span>
+  <div class="value out">
+    <span class="num" id="out-value" aria-live="polite">0</span>
+    <span class="unit" id="out-unit">cal</span>
+  </div>
+</main>
+
+<div class="toggle" role="group" aria-label="Which unit are you entering?">
+  <button type="button" data-unit="g" aria-pressed="true">Type grams</button>
+  <button type="button" data-unit="cal" aria-pressed="false">Type calories</button>
+</div>
+
+<div class="keypad" id="keypad"></div>
+
+<noscript>
+  <p class="noscript">This converter needs JavaScript. It runs entirely on your phone — nothing is sent anywhere.</p>
+</noscript>
+
+<script>
+(function () {
+  "use strict";
+
+  // Calories per 100 g of edible portion — what actually lands on the scale.
+  // Whole foods: USDA FoodData Central.
+  // Tenders: calculated from Tyler's recipe (450 g raw tenderloin + ~70 g adhered
+  // flour/egg/panko = 715 cal, ~22% water lost in the air fryer -> ~408 g finished).
+  // `chip` is the short label on the scroller; `name` is the full one in the header.
+  var FOODS = [
+    { key: "banana",     name: "Banana",          chip: "Banana",          kcal100: 89 },
+    { key: "grapes",     name: "Grapes",          chip: "Grapes",          kcal100: 69 },
+    { key: "strawberry", name: "Strawberries",    chip: "Strawb.",         kcal100: 32 },
+    { key: "blueberry",  name: "Blueberries",     chip: "Blueb.",          kcal100: 57 },
+    { key: "mango",      name: "Mango",           chip: "Mango",           kcal100: 60 },
+    { key: "pineapple",  name: "Pineapple",       chip: "Pineapple",       kcal100: 50 },
+    { key: "corn",       name: "Canned corn",     chip: "Corn",            kcal100: 81,  note: "drained" },
+    { key: "beans",      name: "Black beans",     chip: "Black beans",     kcal100: 118, note: "drained, rinsed" },
+    { key: "avocado",    name: "Avocado",         chip: "Avocado",         kcal100: 167, note: "Hass" },
+    { key: "tenders",    name: "Chicken tenders", chip: "Chicken tenders", kcal100: 175, note: "panko, air-fried" }
+  ];
+
+  var DEL = "⌫";
+  var KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0", DEL];
+  var MAX_DIGITS = 5;
+  var STORE = "food-converter.v1";
+
+  var el = {
+    chips: document.getElementById("chips"),
+    keypad: document.getElementById("keypad"),
+    current: document.getElementById("current"),
+    density: document.getElementById("density"),
+    note: document.getElementById("note"),
+    inLabel: document.getElementById("in-label"),
+    inValue: document.getElementById("in-value"),
+    inUnit: document.getElementById("in-unit"),
+    outLabel: document.getElementById("out-label"),
+    outValue: document.getElementById("out-value"),
+    outUnit: document.getElementById("out-unit"),
+    toggles: Array.prototype.slice.call(document.querySelectorAll(".toggle [data-unit]"))
+  };
+
+  var state = { food: FOODS[0], unit: "g", buffer: "0" };
+
+  // ---- persistence -------------------------------------------------------
+  function load() {
+    try {
+      var saved = JSON.parse(localStorage.getItem(STORE) || "{}");
+      var found = FOODS.filter(function (f) { return f.key === saved.food; })[0];
+      if (found) state.food = found;
+      if (saved.unit === "g" || saved.unit === "cal") state.unit = saved.unit;
+    } catch (e) { /* private mode, corrupt value — defaults are fine */ }
+  }
+  function save() {
+    try {
+      localStorage.setItem(STORE, JSON.stringify({ food: state.food.key, unit: state.unit }));
+    } catch (e) { /* storage full or blocked — the app still works */ }
+  }
+
+  // ---- math --------------------------------------------------------------
+  function format(n) {
+    if (!isFinite(n) || n === 0) return "0";
+    return n < 10 ? String(Number(n.toFixed(1))) : String(Math.round(n));
+  }
+  function convert(value, unit, kcal100) {
+    return unit === "g" ? (value * kcal100) / 100 : (value * 100) / kcal100;
+  }
+
+  function press(buffer, k) {
+    if (k === DEL) return buffer.length <= 1 ? "0" : buffer.slice(0, -1);
+    if (k === ".") return buffer.indexOf(".") !== -1 ? buffer : buffer + ".";
+    if (buffer === "0") return k;
+    if (buffer.replace(".", "").length >= MAX_DIGITS) return buffer;
+    return buffer + k;
+  }
+
+  // ---- render ------------------------------------------------------------
+  function render() {
+    var f = state.food;
+    var n = parseFloat(state.buffer) || 0;
+
+    el.current.textContent = f.name;
+    el.density.innerHTML = "";
+    el.density.append(
+      Object.assign(document.createElement("b"), { textContent: String(f.kcal100) }),
+      document.createTextNode(" cal / 100 g")
+    );
+    el.note.textContent = f.note || "";
+
+    el.inValue.textContent = state.buffer;
+    if (state.unit === "g") {
+      el.inLabel.textContent = "Grams";  el.inUnit.textContent = "g";
+      el.outLabel.textContent = "Calories"; el.outUnit.textContent = "cal";
+    } else {
+      el.inLabel.textContent = "Calories"; el.inUnit.textContent = "cal";
+      el.outLabel.textContent = "Grams"; el.outUnit.textContent = "g";
+    }
+    el.outValue.textContent = format(convert(n, state.unit, f.kcal100));
+  }
+
+  function buzz(ms) {
+    if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} }
+  }
+
+  // ---- chips -------------------------------------------------------------
+  FOODS.forEach(function (f) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.textContent = f.chip;
+    b.setAttribute("aria-label", f.name + ", " + f.kcal100 + " calories per 100 grams");
+    b.setAttribute("aria-pressed", String(f.key === state.food.key));
+    b.addEventListener("click", function () {
+      state.food = f;
+      Array.prototype.forEach.call(el.chips.children, function (c) {
+        c.setAttribute("aria-pressed", String(c === b));
+      });
+      b.scrollIntoView({ inline: "nearest", block: "nearest" });
+      save();
+      render();
+    });
+    el.chips.appendChild(b);
+  });
+
+  // ---- unit toggle -------------------------------------------------------
+  el.toggles.forEach(function (t) {
+    t.setAttribute("aria-pressed", String(t.dataset.unit === state.unit));
+    t.addEventListener("click", function () {
+      if (state.unit === t.dataset.unit) return;
+      state.unit = t.dataset.unit;
+      state.buffer = "0";
+      el.toggles.forEach(function (o) { o.setAttribute("aria-pressed", String(o === t)); });
+      save();
+      render();
+    });
+  });
+
+  // ---- keypad ------------------------------------------------------------
+  // Tap delete to backspace; press and hold it to clear the whole entry.
+  KEYS.forEach(function (k) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "key" + (k === DEL ? " util" : "") + (k === "." ? " dot" : "");
+    b.textContent = k;
+    if (k === DEL) b.setAttribute("aria-label", "Delete. Press and hold to clear.");
+
+    var holdTimer = null;
+    var clearedAt = 0;
+
+    // Commit on `click`, not `pointerup`, so keyboard and screen-reader
+    // activation work too — both synthesize a click and neither fires pointers.
+    // A hold-to-clear is followed by a click we must swallow; a timestamp does
+    // that without leaving a flag set when the finger slides off instead.
+    b.addEventListener("click", function () {
+      if (Date.now() - clearedAt < 500) return;
+      state.buffer = press(state.buffer, k);
+      buzz(8);
+      render();
+    });
+
+    b.addEventListener("pointerdown", function () {
+      b.dataset.down = "true";
+      if (k !== DEL) return;
+      holdTimer = setTimeout(function () {
+        clearedAt = Date.now();
+        state.buffer = "0";
+        buzz(20);
+        render();
+      }, 450);
+    });
+
+    ["pointerup", "pointerleave", "pointercancel"].forEach(function (evt) {
+      b.addEventListener(evt, function () {
+        b.dataset.down = "false";
+        clearTimeout(holdTimer);
+      });
+    });
+
+    el.keypad.appendChild(b);
+  });
+
+  // ---- hardware keyboard (desktop) ---------------------------------------
+  document.addEventListener("keydown", function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var k = null;
+    if (/^[0-9]$/.test(e.key)) k = e.key;
+    else if (e.key === "." || e.key === ",") k = ".";
+    else if (e.key === "Backspace") k = DEL;
+    else if (e.key === "Escape") { state.buffer = "0"; render(); return; }
+    if (!k) return;
+    e.preventDefault();
+    state.buffer = press(state.buffer, k);
+    render();
+  });
+
+  load();
+  el.toggles.forEach(function (t) { t.setAttribute("aria-pressed", String(t.dataset.unit === state.unit)); });
+  Array.prototype.forEach.call(el.chips.children, function (c, i) {
+    c.setAttribute("aria-pressed", String(FOODS[i].key === state.food.key));
+  });
+  render();
+
+  // ---- offline -----------------------------------------------------------
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () { /* offline support is optional */ });
+    });
+  }
+})();
+</script>
+</body>
+</html>
