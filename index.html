@@ -190,16 +190,6 @@
   }
   .value .unit { font-size: 20px; color: var(--muted); }
 
-  .caret {
-    width: 2px;
-    height: .78em;
-    background: var(--accent);
-    align-self: center;
-    flex: none;
-    animation: blink 1.1s steps(1) infinite;
-  }
-  @keyframes blink { 50% { opacity: 0; } }
-
   .divider { height: var(--hair); background: var(--rule); margin: 14px 0; }
 
   .out .num { color: var(--accent); font-size: clamp(30px, 11vw, 40px); }
@@ -252,7 +242,6 @@
   .key.dot { font-size: 30px; line-height: .8; }
 
   @media (prefers-reduced-motion: reduce) {
-    .caret { animation: none; }
     .chip, .key, .toggle button { transition: none; }
   }
 
@@ -281,7 +270,6 @@
   <span class="label" id="in-label">Grams</span>
   <div class="value">
     <span class="num" id="in-value">0</span>
-    <span class="caret" aria-hidden="true"></span>
     <span class="unit" id="in-unit">g</span>
   </div>
 
